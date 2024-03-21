@@ -15,18 +15,20 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
-
     interface LocationPermissionRequester {
         fun requestLocationPermissions()
         fun showLocationDisabledMessage()
     }
 
     var locationPermissionRequester: LocationPermissionRequester? = null
-    private var _count = mutableStateOf(0)
-    val count: Int by _count
 
     private var _location = mutableStateOf<Location?>(null)
     val location: Location? by _location
+    private val locationManager = application.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    private val locationListener = LocationListener { location ->
+        Log.d("ViewModel", "Location: ${location.latitude} , ${location.longitude}")
+        _location.value = location
+    }
 
     private fun isLocationPermissionGranted(): Boolean {
         return ActivityCompat.checkSelfPermission(
@@ -38,7 +40,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
     }
-    @SuppressLint("MissingPermission")
+
+/*    @SuppressLint("MissingPermission")
     fun incrementCount() {
         if (isLocationPermissionGranted()) {
             if (isLocationPermissionGranted()) {
@@ -54,5 +57,21 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         } else {
             locationPermissionRequester?.requestLocationPermissions()
         }
+    }*/
+
+    @SuppressLint("MissingPermission")
+    fun startLocationUpdates() {
+        if (isLocationPermissionGranted()) {
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                0L,
+                0f,
+                locationListener
+            )
+        }
+    }
+
+    fun stopLocationUpdates() {
+        locationManager.removeUpdates(locationListener)
     }
 }

@@ -9,7 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -21,9 +22,8 @@ import com.ravit.alertatemprana.R
 
 @Composable
 fun HomeView(viewModel: HomeViewModel) {
-    val count = viewModel.count
-
     val location = viewModel.location
+    val isTracking = remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -57,20 +57,24 @@ fun HomeView(viewModel: HomeViewModel) {
             contentScale = ContentScale.Crop
         )
         Text(
-            text = "location ${count} \n${location?.latitude}, ${location?.longitude} ",
+            text = "location \n${location?.latitude}, ${location?.longitude} ",
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
             textAlign = TextAlign.Center
         )
         Button(
-            onClick = { viewModel.incrementCount() },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .align(Alignment.End)
+            onClick = {
+                if (isTracking.value) {
+                    viewModel.stopLocationUpdates()
+                } else {
+                    viewModel.startLocationUpdates()
+                }
+                isTracking.value = !isTracking.value
+            },
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Increment")
+            Text(if (isTracking.value) "Detener Localización" else "Iniciar Localización")
         }
     }
 }

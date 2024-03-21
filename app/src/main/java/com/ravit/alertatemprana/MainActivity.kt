@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity(), HomeViewModel.LocationPermissionReques
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            homeViewModel.incrementCount()
+            homeViewModel.startLocationUpdates()
         } else {
             showLocationDisabledMessage()
         }
@@ -46,7 +46,6 @@ class MainActivity : ComponentActivity(), HomeViewModel.LocationPermissionReques
                 }
             }
         }
-
         checkLocationPermission()
     }
 
@@ -61,6 +60,6 @@ class MainActivity : ComponentActivity(), HomeViewModel.LocationPermissionReques
     }
 
     override fun showLocationDisabledMessage() {
-        Toast.makeText(this, "Necesitas activar la ubicación", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "Necesitas activar la ubicación desde ajustes", Toast.LENGTH_LONG).show()
     }
 }
