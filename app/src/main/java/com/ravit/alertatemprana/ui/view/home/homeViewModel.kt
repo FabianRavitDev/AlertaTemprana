@@ -41,24 +41,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 ) == PackageManager.PERMISSION_GRANTED
     }
 
-/*    @SuppressLint("MissingPermission")
-    fun incrementCount() {
-        if (isLocationPermissionGranted()) {
-            if (isLocationPermissionGranted()) {
-                val locationManager = getApplication<Application>().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                val provider = LocationManager.GPS_PROVIDER
-                val locationListener = LocationListener { location ->
-                    _location.value = location
-                    Log.d("ViewModel", "Location: ${location.latitude} , ${location.longitude}")
-                }
-                locationManager.requestLocationUpdates(provider, 0L, 0f, locationListener)
-            }
-            _count.value++
-        } else {
-            locationPermissionRequester?.requestLocationPermissions()
-        }
-    }*/
-
     @SuppressLint("MissingPermission")
     fun startLocationUpdates() {
         if (isLocationPermissionGranted()) {
