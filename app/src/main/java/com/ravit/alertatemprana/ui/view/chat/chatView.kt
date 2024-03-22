@@ -19,24 +19,20 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatView(viewModel: ChatViewModel) {
-    var textState by remember { mutableStateOf(TextFieldValue("")) }
-    val messages = remember { mutableStateListOf<String>() }
+    val textState by viewModel.textState.collectAsState()
+    val messages by viewModel.messages.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -79,8 +75,8 @@ fun ChatView(viewModel: ChatViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
-                    value = textState,
-                    onValueChange = { textState = it },
+                    value = textState.text,
+                    onValueChange = { newText -> viewModel.updateTextState(newText) },
                     modifier = Modifier.weight(1f),
                     placeholder = { Text("Mensaje") },
                     shape = RoundedCornerShape(50.dp)
@@ -88,8 +84,7 @@ fun ChatView(viewModel: ChatViewModel) {
                 IconButton(
                     onClick = {
                         if (textState.text.isNotEmpty()) {
-                            messages.add(textState.text)
-                            textState = TextFieldValue("")  // Clear the input field
+                            viewModel.onMessageSend()
                         }
                     },
                     modifier = Modifier
@@ -101,7 +96,6 @@ fun ChatView(viewModel: ChatViewModel) {
             }
         }
     }
-
 }
 /*
 fun ChatView(viewModel: ChatViewModel) {
