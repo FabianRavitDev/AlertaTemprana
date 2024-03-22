@@ -13,6 +13,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.ravit.alertatemprana.ui.navigation.NavigationEvent
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
     interface LocationPermissionRequester {
@@ -29,6 +34,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         Log.d("ViewModel", "Location: ${location.latitude} , ${location.longitude}")
         _location.value = location
     }
+
+    private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
+    val navigationEvent = _navigationEvent.asSharedFlow()
 
     private fun isLocationPermissionGranted(): Boolean {
         return ActivityCompat.checkSelfPermission(
@@ -55,5 +63,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun stopLocationUpdates() {
         locationManager.removeUpdates(locationListener)
+    }
+
+    fun goToChat() {
+        viewModelScope.launch {
+            _navigationEvent.emit(NavigationEvent.NavigateToChat)
+        }
     }
 }
