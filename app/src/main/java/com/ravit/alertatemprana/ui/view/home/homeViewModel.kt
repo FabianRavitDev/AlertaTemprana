@@ -58,6 +58,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 0f,
                 locationListener
             )
+            goToChat()
         }
     }
 
