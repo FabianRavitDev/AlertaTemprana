@@ -22,6 +22,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,27 +40,25 @@ import com.ravit.alertatemprana.R
 
 @Composable
 fun HomeView(viewModel: HomeViewModel) {
-    val location = viewModel.location
-    val isTracking = remember { mutableStateOf(false) }
-    val showDialog = remember { mutableStateOf(false) }
+    val showDialog by viewModel.showDialog.collectAsState()
 
-    if (showDialog.value) {
+    if (showDialog) {
         AlertDialog(
-            onDismissRequest = { showDialog.value = false },
+            onDismissRequest = { viewModel.toggleDialog(false) },
             title = { Text("Mensaje") },
             text = { Text("¿Deseas enviar un alerta con tu ubicación?") },
             confirmButton = {
                 Button(
                     onClick = {
                         viewModel.startLocationUpdates()
-                        showDialog.value = false
+                        viewModel.toggleDialog(false)
                     }
                 ) {
                     Text("Aceptar")
                 }
             },
             dismissButton = {
-                Button(onClick = { showDialog.value = false }) {
+                Button(onClick = { viewModel.toggleDialog(false) }) {
                     Text("Cancelar")
                 }
             }
@@ -118,7 +118,7 @@ fun HomeView(viewModel: HomeViewModel) {
             )
             Button(
                 onClick = {
-                    showDialog.value = true
+                    viewModel.toggleDialog(true)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA62520))
