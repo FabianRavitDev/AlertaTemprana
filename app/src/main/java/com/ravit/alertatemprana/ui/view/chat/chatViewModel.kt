@@ -22,6 +22,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private val _messages = MutableStateFlow<List<String>>(emptyList())
     val messages: StateFlow<List<String>> = _messages.asStateFlow()
 
+    private val _responseMessages = MutableStateFlow<List<String>>(emptyList())
+    val responseMessages: StateFlow<List<String>> = _responseMessages.asStateFlow()
+
     fun goBack() {
         viewModelScope.launch {
             _navigationEvent.emit(NavigationEvent.GOBackToStop)

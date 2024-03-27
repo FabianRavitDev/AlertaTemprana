@@ -127,13 +127,14 @@ fun ChatView(viewModel: ChatViewModel) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
-                        contentAlignment = Alignment.CenterEnd
+                        contentAlignment = Alignment.CenterEnd // recive Alignment.CenterStart
                     ) {
                         Text(
                             text = message,
+                            color = Color.Black, //  Color.White
                             modifier = Modifier
                                 .background(
-                                    color = Color(0xFFDCF8C6),
+                                    color = Color(0xFFDCF8C6), // Color.White
                                     shape = RoundedCornerShape(12.dp)
                                 )
                                 .padding(8.dp)
