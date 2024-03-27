@@ -24,7 +24,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     fun goBack() {
         viewModelScope.launch {
-            _navigationEvent.emit(NavigationEvent.Back)
+            _navigationEvent.emit(NavigationEvent.GOBackToStop)
         }
     }
     fun addMessage(message: String) {
@@ -34,7 +34,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     fun onMessageSend() {
         val currentText = _textState.value.text
         if (currentText.isNotEmpty()) {
-            _messages.value = _messages.value + currentText
+            _messages.value = _messages.value + currentText.trim()
             _textState.value = TextFieldValue("")
         }
     }

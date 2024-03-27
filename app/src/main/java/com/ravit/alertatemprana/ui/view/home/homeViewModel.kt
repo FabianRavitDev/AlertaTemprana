@@ -46,11 +46,23 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    private val _error = MutableStateFlow(false)
+    val error = _error.asStateFlow()
+
+    private val _messageError = MutableStateFlow("")
+    val messageError = _messageError.asStateFlow()
+
     private val _showDialog = MutableStateFlow(false)
     val showDialog = _showDialog.asStateFlow()
 
     fun toggleDialog(show: Boolean) {
         _showDialog.value = show
+    }
+    fun toggleError(show: Boolean) {
+        _error.value = show
     }
 
     private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
@@ -69,6 +81,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     @SuppressLint("MissingPermission")
     fun startLocationUpdates() {
+        _isLoading.value = true
         if (isLocationPermissionGranted()) {
             locationListener = LocationListener { location ->
                 Log.d("ViewModel", "Location: ${location.latitude} , ${location.longitude}")
@@ -81,10 +94,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     source_type = ServiceType.STANDARD
                 )
 
-                NetworkManager.sendLocation(locat) {
-                    goToChat()
+                NetworkManager.sendLocation(locat, onSuccess = {
+                    if (_isLoading.value) {
+                        goToChat()
+                        _isLoading.value = false
+                    }
+                }, onFailure = { error ->
                     stopLocationUpdates()
-                }
+                    _error.value = true
+                    _isLoading.value = false
+                    Log.d("NetworkManager", "Error fuction: ${error}")
+                    _messageError.value = error.toString()
+                })
             }
 
             locationManager.requestLocationUpdates(
@@ -95,9 +116,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             )
         } else {
             locationPermissionRequester?.requestLocationPermissions()
+            _isLoading.value = false
         }
     }
-
 
     fun stopLocationUpdates() {
         locationManager.removeUpdates(locationListener)

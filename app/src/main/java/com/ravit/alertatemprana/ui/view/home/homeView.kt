@@ -1,8 +1,11 @@
 package com.ravit.alertatemprana.ui.view.home
 
+import android.annotation.SuppressLint
+import android.app.AlertDialog
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,7 +21,9 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,9 +43,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ravit.alertatemprana.R
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun HomeView(viewModel: HomeViewModel) {
     val showDialog by viewModel.showDialog.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    if (error) {
+        if (error) {
+            AlertDialog(
+                onDismissRequest = { viewModel.toggleError(false) },
+                title = { Text("Error") },
+                text = { Text(viewModel.messageError.value) },
+                confirmButton = {
+                    Button(
+                        onClick = { viewModel.toggleError(false) }
+                    ) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
+    }
 
     if (showDialog) {
         AlertDialog(
@@ -65,66 +89,83 @@ fun HomeView(viewModel: HomeViewModel) {
         )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
+    val isLoading by viewModel.isLoading.collectAsState()
+
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(2f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            Text(
-                text = "Generar Alerta",
-                textAlign = TextAlign.Center,
-                style = androidx.compose.ui.text.TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 30.sp,
-                    color = Color(0xFFA62520)
-                )
-            )
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Image description",
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
-                contentScale = ContentScale.Crop
-            )
+                    .aspectRatio(2f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Generar Alerta",
+                    textAlign = TextAlign.Center,
+                    style = androidx.compose.ui.text.TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 30.sp,
+                        color = Color(0xFFA62520)
+                    )
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Image description",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(2f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Al enviar la alerta compartirás tu ubicación",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    textAlign = TextAlign.Center
+                )
+                Button(
+                    onClick = {
+                        viewModel.toggleDialog(true)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA62520))
+                ) {
+                    Text("Enviar Alerta")
+                }
+            }
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(2f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Al enviar la alerta compartirás tu ubicación",
+        if (isLoading) {
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)))
+
+            CircularProgressIndicator(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                textAlign = TextAlign.Center
+                    .align(Alignment.Center)
+                    .size(50.dp),
+                color = MaterialTheme.colorScheme.primary
             )
-            Button(
-                onClick = {
-                    viewModel.toggleDialog(true)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA62520))
-            ) {
-                Text("Enviar Alerta")
-            }
         }
     }
 }

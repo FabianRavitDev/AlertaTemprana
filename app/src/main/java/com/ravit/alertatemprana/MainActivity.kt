@@ -59,8 +59,9 @@
                         }
                         launch {
                             chatViewModel.navigationEvent.collect { event ->
-                                if (event is NavigationEvent.Back) {
-                                    navController.navigateUp()
+                                if (event is NavigationEvent.GOBackToStop) {
+                                    navController.popBackStack()
+                                    homeViewModel.stopLocationUpdates()
                                 }
                             }
                         }

@@ -18,7 +18,7 @@ object NetworkManager {
             .create(ApiService::class.java)
     }
 
-    fun sendLocation(locationModel: LocationModel, onSuccess: () -> Unit) {
+    fun sendLocation(locationModel: LocationModel, onSuccess: () -> Unit, onFailure: (String?) -> Unit) {
         val call = retrofitService().sendLocation(locationModel)
         call.enqueue(object : retrofit2.Callback<Void> {
             override fun onResponse(call: Call<Void>, response: retrofit2.Response<Void>) {
@@ -26,13 +26,15 @@ object NetworkManager {
                     Log.d("NetworkManager", "Respuesta exitosa")
                     onSuccess()
                 } else {
+                    val errorBody = response.errorBody()?.string()
                     Log.d("NetworkManager", "Respuesta no exitosa: ${response.errorBody()?.string()}")
+                    onFailure(errorBody)
                 }
             }
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 Log.d("NetworkManager", "Error en la red: ${t.message}")
+                onFailure(t.message)
             }
         })
     }
-
 }
