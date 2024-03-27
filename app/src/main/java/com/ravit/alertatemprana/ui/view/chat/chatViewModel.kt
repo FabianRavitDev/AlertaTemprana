@@ -27,9 +27,6 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             _navigationEvent.emit(NavigationEvent.GOBackToStop)
         }
     }
-    fun addMessage(message: String) {
-        _messages.value = _messages.value + message
-    }
 
     fun onMessageSend() {
         val currentText = _textState.value.text

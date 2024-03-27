@@ -79,19 +79,20 @@ fun ChatView(viewModel: ChatViewModel) {
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         Row (modifier = Modifier.padding(vertical = 10.dp)) {
+
+                            Icon(
+                                imageVector = Icons.Filled.Warning,
+                                contentDescription = "Alerta",
+                                tint = Color(0xFFF3D014)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = "Alerta enviada",
                                 color = Color.Black,
                                 style = androidx.compose.ui.text.TextStyle(
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp  // Ajusta el tamaño del texto según necesites
+                                    fontSize = 20.sp
                                 )
-                            )
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Icon(
-                                imageVector = Icons.Filled.Warning,
-                                contentDescription = "Alerta",
-                                tint = Color.Black
                             )
                         }
                         Spacer(modifier = Modifier.weight(1f))
@@ -119,9 +120,9 @@ fun ChatView(viewModel: ChatViewModel) {
         ) {
             LazyColumn(modifier = Modifier
                 .weight(1f),
-                reverseLayout = true,
+                reverseLayout = true
             ) {
-                items(messages) { message ->
+                items(messages.reversed()) { message ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
