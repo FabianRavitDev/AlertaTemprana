@@ -27,7 +27,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,10 +38,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ravit.alertatemprana.R
 import com.ravit.alertatemprana.ui.model.SenderType
+import com.ravit.alertatemprana.ui.theme.GrayPrimary
+import com.ravit.alertatemprana.ui.theme.GreenPrimary
+import com.ravit.alertatemprana.ui.theme.RedPrimary
+import com.ravit.alertatemprana.ui.theme.YellowPrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,25 +57,59 @@ fun ChatView(viewModel: ChatViewModel) {
     val messages by viewModel.messages.collectAsState()
     val showDialog = remember { mutableStateOf(false) }
     viewModel.fetchMessage()
+    val MonserratFontFamily = FontFamily(
+        Font(R.font.montserrat, FontWeight.Normal),
+        Font(R.font.montserrat_bold, FontWeight.Bold),
+        Font(R.font.montserrat_semi_bold, FontWeight.SemiBold),
+        Font(R.font.montserrat_italic, FontWeight.Normal)
+    )
 
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text("Alerta") },
-            text = { Text("¿Deseas dejar de compartir tu ubicación?") },
+            title = { Text(text = "Alerta", style = androidx.compose.ui.text.TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontFamily = MonserratFontFamily,
+                fontSize = 24.sp,
+                color = GreenPrimary
+            )) },
+            text = { Text(text = "¿Deseas finalizar la alerta?",
+                style = androidx.compose.ui.text.TextStyle(
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = MonserratFontFamily,
+                    fontSize = 20.sp,
+                    color = Color.Black
+                )) },
             confirmButton = {
                 Button(
                     onClick = {
                         viewModel.goBack()
                         showDialog.value = false
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = YellowPrimary,
+                        contentColor = Color.White
+                    )
                 ) {
-                    Text("Si")
+                    Text(text = "Si", style = androidx.compose.ui.text.TextStyle(
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = MonserratFontFamily,
+                        fontSize = 14.sp,
+                        color = GreenPrimary
+                    ))
                 }
             },
             dismissButton = {
-                Button(onClick = { showDialog.value = false }) {
-                    Text("No")
+                Button(onClick = { showDialog.value = false },colors = ButtonDefaults.buttonColors(
+                    containerColor = GrayPrimary,
+                    contentColor = Color.White
+                )) {
+                    Text(text = "No", style = androidx.compose.ui.text.TextStyle(
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = MonserratFontFamily,
+                        fontSize = 14.sp,
+                        color = Color.White
+                    ))
                 }
             }
         )
@@ -81,19 +124,14 @@ fun ChatView(viewModel: ChatViewModel) {
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         Row (modifier = Modifier.padding(vertical = 10.dp)) {
-
-                            Icon(
-                                imageVector = Icons.Filled.Warning,
-                                contentDescription = "Alerta",
-                                tint = Color(0xFFF3D014)
-                            )
-                            Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = "Alerta enviada",
-                                color = Color.Black,
+                                color = GreenPrimary,
                                 style = androidx.compose.ui.text.TextStyle(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontFamily = MonserratFontFamily,
+                                    fontSize = 18.sp,
+                                    color = GreenPrimary
                                 )
                             )
                         }
@@ -103,22 +141,30 @@ fun ChatView(viewModel: ChatViewModel) {
                             onClick = { showDialog.value = true },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Transparent,
-                                contentColor = Color(0xFFA62520)
+                                contentColor = RedPrimary
                             )
                         ) {
                             Text(
                                 text = "Detener Alerta",
-                                color = Color(0xFFA62520)
+                                color = RedPrimary,
+                                style = androidx.compose.ui.text.TextStyle(
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontFamily = MonserratFontFamily,
+                                    fontSize = 14.sp,
+                                    color = RedPrimary
+                                )
                             )
                         }
                     }
-                }
+                },
+                colors = TopAppBarDefaults.smallTopAppBarColors(
+                containerColor = YellowPrimary.copy(alpha = 0.5f)
+                )
             )
         }
     ) { innerPadding ->
         Column(modifier = Modifier
             .padding(innerPadding)
-            .background(Color(0xFFADD8E6))
         ) {
             LazyColumn(modifier = Modifier
                 .weight(1f),
@@ -141,9 +187,14 @@ fun ChatView(viewModel: ChatViewModel) {
                         Text(
                             text = message.message,
                             color = Color.Black, //  Color.White
+                            style = androidx.compose.ui.text.TextStyle(
+                                fontWeight = FontWeight.SemiBold,
+                                fontFamily = MonserratFontFamily,
+                                fontSize = 16.sp,
+                            ),
                             modifier = Modifier
                                 .background(
-                                    color = if (message.sender == SenderType.SEND) Color(0xFFDCF8C6) else Color.White, // Color.White
+                                    color = if (message.sender == SenderType.SEND) GreenPrimary.copy(alpha = 0.25f) else Color.LightGray.copy(alpha = 0.25f), // Color.White
                                     shape = RoundedCornerShape(12.dp)
                                 )
                                 .padding(8.dp)
@@ -153,6 +204,7 @@ fun ChatView(viewModel: ChatViewModel) {
             }
             Row(
                 modifier = Modifier
+                    .background(Color.LightGray)
                     .fillMaxWidth()
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -163,8 +215,17 @@ fun ChatView(viewModel: ChatViewModel) {
                     modifier = Modifier
                         .weight(1f)
                         .background(Color.White, shape = RoundedCornerShape(50.dp)),
-                    placeholder = { Text("Mensaje") },
-                    shape = RoundedCornerShape(50.dp)
+                    placeholder = { Text(text = "Mensaje",
+                        style = androidx.compose.ui.text.TextStyle(
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = MonserratFontFamily,
+                            fontSize = 16.sp,
+                        )) },
+                    shape = RoundedCornerShape(50.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = GreenPrimary.copy(alpha = 0.75f),
+                        unfocusedBorderColor = GrayPrimary.copy(alpha = 0.75f)
+                    )
                 )
                 IconButton(
                     onClick = {
@@ -176,7 +237,7 @@ fun ChatView(viewModel: ChatViewModel) {
                         .align(Alignment.CenterVertically)
                         .padding(start = 8.dp)
                 ) {
-                    Icon(Icons.Filled.Send, "Send", tint = Color(0xFF296588))
+                    Icon(Icons.Filled.Send, "Send", tint = GreenPrimary)
                 }
             }
         }
