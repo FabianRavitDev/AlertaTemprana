@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ravit.alertatemprana.ui.model.SenderType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,6 +47,7 @@ fun ChatView(viewModel: ChatViewModel) {
     val textState by viewModel.textState.collectAsState()
     val messages by viewModel.messages.collectAsState()
     val showDialog = remember { mutableStateOf(false) }
+    viewModel.fetchMessage()
 
     if (showDialog.value) {
         AlertDialog(
@@ -126,15 +128,22 @@ fun ChatView(viewModel: ChatViewModel) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp),
-                        contentAlignment = Alignment.CenterEnd // recive Alignment.CenterStart
+                            .padding(8.dp)
+                            .then(
+                                if (message.sender == SenderType.SEND) {
+                                    Modifier.padding(start = 64.dp)
+                                } else {
+                                    Modifier.padding(end = 64.dp)
+                                }
+                            ),
+                        contentAlignment = if (message.sender == SenderType.SEND) Alignment.CenterEnd else Alignment.CenterStart
                     ) {
                         Text(
-                            text = message,
+                            text = message.message,
                             color = Color.Black, //  Color.White
                             modifier = Modifier
                                 .background(
-                                    color = Color(0xFFDCF8C6), // Color.White
+                                    color = if (message.sender == SenderType.SEND) Color(0xFFDCF8C6) else Color.White, // Color.White
                                     shape = RoundedCornerShape(12.dp)
                                 )
                                 .padding(8.dp)

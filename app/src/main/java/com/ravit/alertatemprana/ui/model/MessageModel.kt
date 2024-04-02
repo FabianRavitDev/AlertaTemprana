@@ -1,7 +1,12 @@
 package com.ravit.alertatemprana.ui.model
 
-class MessageModel (
-    code: String,
-    sender: String,
-    message: String
+data class MessageModel (
+    val code: String,
+    val sender: SenderType,
+    val message: String
 )
+
+enum class SenderType {
+    RESPONSE,
+    SEND
+}

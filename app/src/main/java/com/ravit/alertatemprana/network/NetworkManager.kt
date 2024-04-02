@@ -40,23 +40,21 @@ object NetworkManager {
         })
     }
 
-    fun getMessage(onSuccess: (MessageModel) -> Unit, onFailure: (String?) -> Unit) {
+    fun getMessage(onSuccess:  (List<MessageModel>) -> Unit, onFailure: (String?) -> Unit) {
         val call = retrofitService().getMessage()
-        call.enqueue(object : retrofit2.Callback<MessageModel> {
-            override fun onResponse(call: Call<MessageModel>, response: retrofit2.Response<MessageModel>) {
+        call.enqueue(object : retrofit2.Callback<List<MessageModel>> {
+            override fun onResponse(call: Call<List<MessageModel>>, response: retrofit2.Response<List<MessageModel>>) {
                 if (response.isSuccessful) {
-                    response.body()?.let { body ->
-                        Log.d("NetworkManager", "Respuesta exitosa")
-                        onSuccess(body)
-                    }
+                        Log.d("NetworkManager", "Respuesta exitosa Mensaje ${response.body()}")
+                    onSuccess(response.body() ?: listOf())
                 } else {
                     val errorBody = response.errorBody()?.string()
-                    Log.d("NetworkManager", "Respuesta no exitosa: $errorBody")
+                    Log.d("NetworkManager", "Respuesta no exitosa mensaje: $errorBody")
                     onFailure(errorBody)
                 }
             }
-            override fun onFailure(call: Call<MessageModel>, t: Throwable) {
-                Log.d("NetworkManager", "Error en la red: ${t.message}")
+            override fun onFailure(call: Call<List<MessageModel>>, t: Throwable) {
+                Log.d("NetworkManager", "Error en la red mensaje: ${t.message}")
                 onFailure(t.message)
             }
         })

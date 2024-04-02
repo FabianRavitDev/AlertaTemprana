@@ -105,11 +105,11 @@ fun HomeView(viewModel: HomeViewModel) {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Generar Alerta",
+                    text = "Sistema Integrado de Emergencias y Convivencia Ciudadana.",
                     textAlign = TextAlign.Center,
                     style = androidx.compose.ui.text.TextStyle(
                         fontWeight = FontWeight.Bold,
-                        fontSize = 30.sp,
+                        fontSize = 24.sp,
                         color = Color(0xFFA62520)
                     )
                 )
@@ -120,12 +120,12 @@ fun HomeView(viewModel: HomeViewModel) {
                     .aspectRatio(1f)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.logo),
+                    painter = painterResource(id = R.drawable.logovertical),
                     contentDescription = "Image description",
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Fit
                 )
             }
 

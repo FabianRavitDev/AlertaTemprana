@@ -12,5 +12,5 @@ interface ApiService {
     fun sendLocation(@Body locationModel: LocationModel): Call<Void>
 
     @GET(NetworkManager.MESSAGE)
-    fun getMessage(): Call<MessageModel>
+    fun getMessage(): Call<List<MessageModel>>
 }
