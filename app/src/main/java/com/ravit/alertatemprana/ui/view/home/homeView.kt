@@ -101,7 +101,7 @@ fun HomeView(viewModel: HomeViewModel) {
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.startLocationUpdates()
+                        viewModel.login()
                         viewModel.toggleDialog(false)
                     },
                     colors = ButtonDefaults.buttonColors(

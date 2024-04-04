@@ -34,15 +34,14 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     var count = 0
 
     fun fetchMessage() {
-        if (count < 1) {
-            com.ravit.alertatemprana.network.NetworkManager.getMessage(onSuccess = { messageModel ->
-                _messages.value = _messages.value + messageModel
-            }, onFailure = { errorMessage ->
-                _error.value = errorMessage ?: "Unknown error"
-            })
-            count = 1
-        }
-
+//        if (count < 1) {
+//            com.ravit.alertatemprana.network.NetworkManager.getMessage(onSuccess = { messageModel ->
+//                _messages.value = _messages.value + messageModel
+//            }, onFailure = { errorMessage ->
+//                _error.value = errorMessage ?: "Unknown error"
+//            })
+//            count = 1
+//        }
     }
 
     fun goBack() {

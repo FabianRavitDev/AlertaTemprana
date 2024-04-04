@@ -16,13 +16,15 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ravit.alertatemprana.network.NetworkManager
 import com.ravit.alertatemprana.ui.model.LocationModel
-import com.ravit.alertatemprana.ui.model.ServiceType
+import com.ravit.alertatemprana.ui.model.PositionModel
 import com.ravit.alertatemprana.ui.navigation.NavigationEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Timer
+import java.util.TimerTask
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
     interface LocationPermissionRequester {
@@ -31,19 +33,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     var locationPermissionRequester: LocationPermissionRequester? = null
-    lateinit var locat: LocationModel
+    lateinit var locat: PositionModel
     private var _location = mutableStateOf<Location?>(null)
     val location: Location? by _location
     private val locationManager = application.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     private var locationListener = LocationListener { location ->
-        Log.d("ViewModel", "Location: ${location.latitude} , ${location.longitude}")
+        Log.d("NetworkManager", "LocationVM: ${location.latitude} , ${location.longitude}")
         _location.value = location
-        locat = LocationModel(
-            id = "hola1",
-            latitude = location.latitude,
-            longitude = location.longitude,
-            source_type = ServiceType.STANDARD
-        )
     }
 
     private val _isLoading = MutableStateFlow(false)
@@ -57,6 +53,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _showDialog = MutableStateFlow(false)
     val showDialog = _showDialog.asStateFlow()
+
+    private var locationTimer: Timer? = null
 
     fun toggleDialog(show: Boolean) {
         _showDialog.value = show
@@ -79,6 +77,37 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 ) == PackageManager.PERMISSION_GRANTED
     }
 
+    fun login() {
+        _isLoading.value = true
+        NetworkManager.loginLocation(onSuccess = {
+            if (_isLoading.value) {
+                sendFirstAlert()
+                goToChat()
+                _isLoading.value = false
+            }
+        }, onFailure = { error ->
+            stopLocationUpdates()
+            _error.value = true
+            _isLoading.value = false
+            Log.d("NetworkManager", "Error fuction: ${error}")
+            _messageError.value = error.toString()
+        })
+    }
+
+    fun sendFirstAlert() {
+        _isLoading.value = true
+        val data = LocationModel(description = "Nueva description", severity = "Alta", status = "activa")
+        NetworkManager.sendAlert(data,
+            onSuccess = { locationModel ->
+                Log.d("NetworkManager", "Alerta enviada correctamente: $locationModel")
+                startLocationUpdates()
+            },
+            onFailure = { error ->
+                Log.e("NetworkManager", "Error al enviar first alerta: $error")
+                // Lógica adicional para manejar el error
+            })
+    }
+
     @SuppressLint("MissingPermission")
     fun startLocationUpdates() {
         _isLoading.value = true
@@ -87,27 +116,26 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 Log.d("ViewModel", "Location: ${location.latitude} , ${location.longitude}")
                 _location.value = location
 
-                locat = LocationModel(
-                    id = "hola1",
+                locat = PositionModel(
                     latitude = location.latitude,
-                    longitude = location.longitude,
-                    source_type = ServiceType.STANDARD
+                    longitude = location.longitude
                 )
 
-                NetworkManager.sendLocation(locat, onSuccess = {
-                    if (_isLoading.value) {
-                        goToChat()
-                        _isLoading.value = false
-                    }
-                }, onFailure = { error ->
-                    stopLocationUpdates()
-                    _error.value = true
-                    _isLoading.value = false
-                    Log.d("NetworkManager", "Error fuction: ${error}")
-                    _messageError.value = error.toString()
-                })
+                if (locationTimer == null) {
+                    locationTimer = Timer()
+                    locationTimer?.schedule(object : TimerTask() {
+                        override fun run() {
+                            NetworkManager.sendLocation(locat,
+                                onSuccess = {
+                                    Log.d("NetworkManager", "Send location correctamente")
+                                },
+                                onFailure = { error ->
+                                    Log.e("NetworkManager", "Error en stop alerta: $error")
+                                })
+                        }
+                    }, 0, 10 * 1000)
+                }
             }
-
             locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
                 0L,
@@ -122,6 +150,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun stopLocationUpdates() {
         locationManager.removeUpdates(locationListener)
+        NetworkManager.stopAlert(
+            onSuccess = {
+                Log.d("NetworkManager", "Alerta en stop correctamente")
+                // Lógica adicional para manejar la respuesta exitosa
+            },
+            onFailure = { error ->
+                Log.e("NetworkManager", "Error en stop alerta: $error")
+                // Lógica adicional para manejar el error
+            })
     }
 
     fun goToChat() {
