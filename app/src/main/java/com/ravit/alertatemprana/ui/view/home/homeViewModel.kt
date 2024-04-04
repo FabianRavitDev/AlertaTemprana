@@ -149,15 +149,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun stopLocationUpdates() {
+        _isLoading.value = true
+        locationTimer?.cancel()
+        locationTimer = null
         locationManager.removeUpdates(locationListener)
+
         NetworkManager.stopAlert(
             onSuccess = {
                 Log.d("NetworkManager", "Alerta en stop correctamente")
-                // Lógica adicional para manejar la respuesta exitosa
+                _isLoading.value = false
             },
             onFailure = { error ->
                 Log.e("NetworkManager", "Error en stop alerta: $error")
-                // Lógica adicional para manejar el error
+                _isLoading.value = false
             })
     }
 

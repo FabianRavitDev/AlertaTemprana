@@ -23,17 +23,17 @@ object NetworkManager {
     const val STOP = "services/{id}/stop/"
     const val POSITION = "services/{id}/locations/"
 
-    private fun provideOkHttpClient(): OkHttpClient {
-        val loggingInterceptor = LoggingInterceptor()
-        return OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .build()
-    }
+//    private fun provideOkHttpClient(): OkHttpClient { // ver URL
+//        val loggingInterceptor = LoggingInterceptor()
+//        return OkHttpClient.Builder()
+//            .addInterceptor(loggingInterceptor)
+//            .build()
+//    }
 
     private fun retrofitService(): ApiService {
         return Retrofit.Builder()
             .baseUrl(MAIN_API)
-            .client(provideOkHttpClient())
+//            .client(provideOkHttpClient()) // ver URL
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
@@ -56,9 +56,8 @@ object NetworkManager {
                         onFailure("Token o id no válido")
                     }
                 } else {
-                    val errorBody = response.errorBody()?.string()
                     Log.d("NetworkManager", "Respuesta no exitosa: ${response.message()}")
-                    onFailure(errorBody)
+                    onFailure(response.message())
                 }
             }
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
@@ -84,9 +83,8 @@ object NetworkManager {
                             onSuccess(locationModel)
                         }
                     } else {
-                        val errorBody = response.errorBody()?.string()
-                        Log.d("NetworkManager", "Error al enviar first alerta: $errorBody")
-                        onFailure(errorBody)
+                        Log.d("NetworkManager", "Error al enviar first alerta: ${response.message()}")
+                        onFailure(response.message())
                     }
                 }
 
@@ -117,9 +115,8 @@ object NetworkManager {
                             onSuccess(resonse)
                         }
                     } else {
-                        val errorBody = response.errorBody()?.string()
-                        Log.d("NetworkManager", "Error al enviar location: $errorBody")
-                        onFailure(errorBody)
+                        Log.d("NetworkManager", "Error al enviar location: ${response.message()}")
+                        onFailure(response.message())
                     }
                 }
 
@@ -162,11 +159,11 @@ object NetworkManager {
     }
 }
 
-class LoggingInterceptor : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
-        val url = request.url()
-        Log.e("NetworkManager", "URL: $url")
-        return chain.proceed(request)
-    }
-}
+//class LoggingInterceptor : Interceptor { // mostrar la URL de endpoint
+//    override fun intercept(chain: Interceptor.Chain): Response {
+//        val request = chain.request()
+//        val url = request.url()
+//        Log.e("NetworkManager", "URL: $url")
+//        return chain.proceed(request)
+//    }
+//}
