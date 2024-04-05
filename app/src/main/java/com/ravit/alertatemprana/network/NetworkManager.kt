@@ -1,6 +1,7 @@
 package com.ravit.alertatemprana.network
 
 import android.util.Log
+import com.google.gson.Gson
 import com.ravit.alertatemprana.ui.model.Location
 import com.ravit.alertatemprana.ui.model.LocationModel
 import com.ravit.alertatemprana.ui.model.LoginRequest
@@ -94,7 +95,7 @@ object NetworkManager {
                 }
             })
         } else {
-            Log.e("NetworkManager", "Token null")
+            Log.e("NetworkManager", "Token null enviar alert")
             onFailure("Token nulo")
         }
     }
@@ -126,7 +127,7 @@ object NetworkManager {
                 }
             })
         } else {
-            Log.e("NetworkManager", "Token null")
+            Log.e("NetworkManager", "Token null send location")
             onFailure("Token nulo")
         }
     }
@@ -148,12 +149,12 @@ object NetworkManager {
                     }
 
                     override fun onFailure(call: Call<Void>, t: Throwable) {
-                        Log.d("NetworkManager", "Error en la red al enviar alerta: ${t.message}")
+                        Log.d("NetworkManager", "Error en la red al stop alerta: ${t.message}")
                         onFailure(t.message)
                     }
                 })
         } else {
-            Log.e("NetworkManager", "Token nulo")
+            Log.e("NetworkManager", "Token nulo stop alert")
             onFailure("Token nulo")
         }
     }

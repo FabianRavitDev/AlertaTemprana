@@ -84,7 +84,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 _isLoading.value = false
             }
         }, onFailure = { error ->
-            stopLocationUpdates()
             _error.value = true
             _isLoading.value = false
             Log.d("NetworkManager", "Error login: ${error}")
@@ -94,7 +93,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun sendFirstAlert() {
         _isLoading.value = true
-        val data = LocationModel(description = "Nueva description", severity = "Alta", status = "activa")
+        val data = LocationModel(description = "test 1", severity = "Media", status = "activa")
         NetworkManager.sendAlert(data,
             onSuccess = { locationModel ->
                 Log.d("NetworkManager", "Alerta enviada correctamente: $locationModel")
