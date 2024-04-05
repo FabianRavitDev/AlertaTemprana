@@ -9,7 +9,6 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.util.Log
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
@@ -35,7 +34,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     var locationPermissionRequester: LocationPermissionRequester? = null
     lateinit var locat: PositionModel
     private var _location = mutableStateOf<Location?>(null)
-    val location: Location? by _location
     private val locationManager = application.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     private var locationListener = LocationListener { location ->
         Log.d("NetworkManager", "LocationVM: ${location.latitude} , ${location.longitude}")
@@ -89,7 +87,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             stopLocationUpdates()
             _error.value = true
             _isLoading.value = false
-            Log.d("NetworkManager", "Error fuction: ${error}")
+            Log.d("NetworkManager", "Error login: ${error}")
             _messageError.value = error.toString()
         })
     }
@@ -103,6 +101,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 startLocationUpdates()
             },
             onFailure = { error ->
+                _error.value = true
+                _messageError.value = error.toString()
                 Log.e("NetworkManager", "Error al enviar first alerta: $error")
                 // Lógica adicional para manejar el error
             })
@@ -127,10 +127,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                         override fun run() {
                             NetworkManager.sendLocation(locat,
                                 onSuccess = {
+                                    _isLoading.value = false
                                     Log.d("NetworkManager", "Send location correctamente")
                                 },
                                 onFailure = { error ->
-                                    Log.e("NetworkManager", "Error en stop alerta: $error")
+                                    _isLoading.value = false
+                                    _error.value = true
+                                    _messageError.value = error.toString()
+                                    Log.e("NetworkManager", "Error en start location: $error")
                                 })
                         }
                     }, 0, 10 * 1000)
@@ -160,8 +164,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 _isLoading.value = false
             },
             onFailure = { error ->
-                Log.e("NetworkManager", "Error en stop alerta: $error")
+                _messageError.value = error.toString()
+                Log.e("NetworkManager", "Error en stop location: $error")
                 _isLoading.value = false
+                _error.value = true
             })
     }
 

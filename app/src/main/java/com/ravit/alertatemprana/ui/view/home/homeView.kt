@@ -49,7 +49,6 @@ fun HomeView(viewModel: HomeViewModel) {
     )
 
     if (error) {
-        if (error) {
             AlertDialog(
                 onDismissRequest = { viewModel.toggleError(false) },
                 title = { Text(text = "Error",
@@ -69,7 +68,7 @@ fun HomeView(viewModel: HomeViewModel) {
                             style = androidx.compose.ui.text.TextStyle(
                                 fontWeight = FontWeight.SemiBold,
                                 fontFamily = MonserratFontFamily,
-                                fontSize = 24.sp,
+                                fontSize = 14.sp,
                                 color = Color.Black
                             )
                         )
@@ -77,7 +76,6 @@ fun HomeView(viewModel: HomeViewModel) {
                 }
             )
         }
-    }
 
     if (showDialog) {
         AlertDialog(
