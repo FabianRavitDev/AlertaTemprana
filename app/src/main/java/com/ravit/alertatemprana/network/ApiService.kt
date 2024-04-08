@@ -4,6 +4,7 @@ import com.ravit.alertatemprana.ui.model.Location
 import com.ravit.alertatemprana.ui.model.LocationModel
 import com.ravit.alertatemprana.ui.model.LoginRequest
 import com.ravit.alertatemprana.ui.model.LoginResponse
+import com.ravit.alertatemprana.ui.model.MessageModel
 import com.ravit.alertatemprana.ui.model.PositionModel
 import com.ravit.alertatemprana.ui.model.Service
 import retrofit2.Call
@@ -21,4 +22,8 @@ interface ApiService {
     fun stopAlert(@Path("id") id: Int, @Header("Authorization") authToken: String): Call<Void>
     @POST(NetworkManager.POSITION)
     fun sendPosition(@Path("id") id: Int, @Header("Authorization") authToken: String, @Body alertRequest: Location): Call<PositionModel>
+
+    @POST(NetworkManager.MESSAGE)
+    fun sendMessage(@Path("id") id: Int, @Header("Authorization") authToken: String, @Body message: MessageModel): Call<MessageModel>
+
 }

@@ -54,6 +54,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private var locationTimer: Timer? = null
 
+
     fun toggleDialog(show: Boolean) {
         _showDialog.value = show
     }
@@ -63,6 +64,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
     val navigationEvent = _navigationEvent.asSharedFlow()
+
+    private val _room_id = MutableStateFlow(0)
+    val room_id = _room_id.asStateFlow()
 
     private fun isLocationPermissionGranted(): Boolean {
         return ActivityCompat.checkSelfPermission(
@@ -93,11 +97,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun sendFirstAlert() {
         _isLoading.value = true
-        val data = LocationModel(description = "test 1", severity = "Media", status = "activa")
+        val data = LocationModel(description = "Send location", severity = "Media", status = "activa")
         NetworkManager.sendAlert(data,
             onSuccess = { locationModel ->
-                Log.d("NetworkManager", "Alerta enviada correctamente: $locationModel")
-                startLocationUpdates()
+                _room_id.value = locationModel.room_id!! // TO DO
+                Log.e("NetworkManager", "first alert: ${_room_id.value}")
+//                startLocationUpdates()
             },
             onFailure = { error ->
                 _error.value = true
@@ -112,7 +117,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         _isLoading.value = true
         if (isLocationPermissionGranted()) {
             locationListener = LocationListener { location ->
-                Log.d("ViewModel", "Location: ${location.latitude} , ${location.longitude}")
                 _location.value = location
 
                 locat = PositionModel(
@@ -127,7 +131,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                             NetworkManager.sendLocation(locat,
                                 onSuccess = {
                                     _isLoading.value = false
-                                    Log.d("NetworkManager", "Send location correctamente")
                                 },
                                 onFailure = { error ->
                                     _isLoading.value = false

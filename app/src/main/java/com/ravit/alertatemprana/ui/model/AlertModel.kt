@@ -14,7 +14,8 @@ class LocationModel (
     @SerializedName("status") val status: String? = null,
     @SerializedName("created_at") val created_at: Date? = null,
     @SerializedName("updated_at") val updated_at: Date? = null,
-    @SerializedName("error") val error: String? = null
+    @SerializedName("error") val error: String? = null,
+    @SerializedName("room_id") val room_id: Int? = null
 )
 
 enum class ServiceType {

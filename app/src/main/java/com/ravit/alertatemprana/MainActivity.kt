@@ -1,19 +1,23 @@
     package com.ravit.alertatemprana
 
     import android.Manifest
+    import android.annotation.SuppressLint
     import android.content.pm.PackageManager
     import android.os.Bundle
     import android.widget.Toast
     import androidx.activity.ComponentActivity
     import androidx.activity.compose.setContent
     import androidx.activity.result.contract.ActivityResultContracts
+    import androidx.activity.viewModels
     import androidx.compose.foundation.layout.fillMaxSize
     import androidx.compose.material3.MaterialTheme
     import androidx.compose.material3.Surface
     import androidx.compose.runtime.LaunchedEffect
+    import androidx.compose.runtime.collectAsState
     import androidx.compose.ui.Modifier
     import androidx.core.content.ContextCompat
     import androidx.lifecycle.ViewModelProvider
+    import androidx.lifecycle.viewmodel.compose.viewModel
     import androidx.navigation.compose.NavHost
     import androidx.navigation.compose.composable
     import androidx.navigation.compose.rememberNavController
@@ -27,7 +31,7 @@
 
     class MainActivity : ComponentActivity(), HomeViewModel.LocationPermissionRequester {
         private lateinit var homeViewModel: HomeViewModel
-        private lateinit var chatViewModel: ChatViewModel
+//        private lateinit var chatViewModel: ChatViewModel
 
         private val locationPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
@@ -39,32 +43,36 @@
             }
         }
 
+        @SuppressLint("StateFlowValueCalledInComposition")
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
-            chatViewModel = ViewModelProvider(this)[ChatViewModel::class.java]
+//            chatViewModel = ViewModelProvider(this)[ChatViewModel::class.java]
             homeViewModel.locationPermissionRequester = this
 
             setContent {
                 AlertaTempranaTheme {
                     val navController = rememberNavController()
 
-                    LaunchedEffect(homeViewModel, chatViewModel) {
-                        launch {
-                            homeViewModel.navigationEvent.collect { event ->
-                                if (event is NavigationEvent.NavigateToChat) {
-                                    navController.navigate("chatView")
+                    LaunchedEffect(homeViewModel) {
+                        if (navController.currentBackStackEntry?.destination?.route == "homeView") {
+                            launch {
+                                homeViewModel.navigationEvent.collect { event ->
+                                    if (event is NavigationEvent.NavigateToChat) {
+                                        navController.navigate("chatView")
+                                    }
                                 }
                             }
                         }
-                        launch {
-                            chatViewModel.navigationEvent.collect { event ->
-                                if (event is NavigationEvent.GOBackToStop) {
-                                    navController.popBackStack()
-                                    homeViewModel.stopLocationUpdates()
-                                }
-                            }
-                        }
+
+//                        launch {
+//                            chatViewModel.navigationEvent.collect { event ->
+//                                if (event is NavigationEvent.GOBackToStop) {
+//                                    navController.popBackStack()
+//                                    homeViewModel.stopLocationUpdates()
+//                                }
+//                            }
+//                        }
                     }
 
                     Surface(
@@ -73,7 +81,19 @@
                     ) {
                         NavHost(navController = navController, startDestination = "homeView") {
                             composable("homeView") { HomeView(viewModel = homeViewModel) }
-                            composable("chatView") { ChatView(viewModel = chatViewModel) }
+                            composable("chatView") {
+                                val chatViewModel: ChatViewModel = viewModel()
+                                chatViewModel.room_id = homeViewModel.room_id.value
+                                val navigationEventState = chatViewModel.navigationEvent.collectAsState(initial = null)
+                                LaunchedEffect(navigationEventState.value) {
+                                    val event = navigationEventState.value
+                                    if (event is NavigationEvent.GOBackToStop) {
+                                        navController.popBackStack()
+                                        homeViewModel.stopLocationUpdates()
+                                    }
+                                }
+                                ChatView(viewModel = chatViewModel)
+                            }
                         }
                     }
                 }

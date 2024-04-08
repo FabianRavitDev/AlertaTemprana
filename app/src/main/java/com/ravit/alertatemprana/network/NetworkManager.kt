@@ -6,6 +6,7 @@ import com.ravit.alertatemprana.ui.model.Location
 import com.ravit.alertatemprana.ui.model.LocationModel
 import com.ravit.alertatemprana.ui.model.LoginRequest
 import com.ravit.alertatemprana.ui.model.LoginResponse
+import com.ravit.alertatemprana.ui.model.MessageModel
 import com.ravit.alertatemprana.ui.model.PositionModel
 import com.ravit.alertatemprana.ui.model.Service
 import com.ravit.alertatemprana.ui.model.Singleton.UserManager
@@ -23,6 +24,7 @@ object NetworkManager {
     const val ALERTS= "services/"
     const val STOP = "services/{id}/stop/"
     const val POSITION = "services/{id}/locations/"
+    const val MESSAGE = "/rooms/{id}/messages"
 
 //    private fun provideOkHttpClient(): OkHttpClient { // ver URL
 //        val loggingInterceptor = LoggingInterceptor()
@@ -49,7 +51,6 @@ object NetworkManager {
                 if (response.isSuccessful) {
                     val token = response.body()?.token
                     val id = response.body()?.user?.id
-                    Log.d("NetworkManager", "Respuesta id: $id exitosa token < ${token} >")
                     if (token != null && id != null) {
                         UserManager.setUser(token, id)
                         onSuccess()
@@ -110,7 +111,7 @@ object NetworkManager {
                 override fun onResponse(call: Call<PositionModel>, response: retrofit2.Response<PositionModel>) {
                     if (response.isSuccessful) {
                         val resonse = response.body()
-                        Log.d("NetworkManager", "Location enviada exitosamente: id - ${id}")
+//                        Log.d("NetworkManager", "Location enviada exitosamente: id - ${id}")
                         UserManager.setIdMessage(id)
                         if (resonse != null) {
                             onSuccess(resonse)
@@ -153,6 +154,33 @@ object NetworkManager {
                         onFailure(t.message)
                     }
                 })
+        } else {
+            Log.e("NetworkManager", "Token nulo stop alert")
+            onFailure("Token nulo")
+        }
+    }
+
+    fun sendMessage(roomID: Int, message: MessageModel,onSuccess: (MessageModel) -> Unit, onFailure: (String?) -> Unit) { //sendMessage
+        val token = UserManager.getToken()
+        if (token != null) {
+            val call = retrofitService().sendMessage(roomID, token, message)
+            call.enqueue(object : retrofit2.Callback<MessageModel> {
+                override fun onResponse(call: Call<MessageModel>, response: retrofit2.Response<MessageModel>) {
+                    if (response.isSuccessful) {
+                        val resonse = response.body()
+                        if (resonse != null) {
+                            onSuccess(resonse)
+                        }
+                    } else {
+                        Log.d("NetworkManager", "Error al enviar mensaje: ${response.message()}")
+                        onFailure(response.message())
+                    }
+                }
+                override fun onFailure(call: Call<MessageModel>, t: Throwable) {
+                    Log.d("NetworkManager", "Error en la red al enviar location: ${t.message}")
+                    onFailure(t.message)
+                }
+            })
         } else {
             Log.e("NetworkManager", "Token nulo stop alert")
             onFailure("Token nulo")
