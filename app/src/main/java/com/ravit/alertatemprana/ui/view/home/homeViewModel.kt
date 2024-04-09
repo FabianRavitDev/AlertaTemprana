@@ -84,7 +84,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         NetworkManager.loginLocation(onSuccess = {
             if (_isLoading.value) {
                 sendFirstAlert()
-                goToChat()
                 _isLoading.value = false
             }
         }, onFailure = { error ->
@@ -102,7 +101,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             onSuccess = { locationModel ->
                 _room_id.value = locationModel.room_id!! // TO DO
                 Log.e("NetworkManager", "first alert: ${_room_id.value}")
-//                startLocationUpdates()
+                goToChat()
             },
             onFailure = { error ->
                 _error.value = true
@@ -177,5 +176,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _navigationEvent.emit(NavigationEvent.NavigateToChat)
         }
+        startLocationUpdates()
     }
 }

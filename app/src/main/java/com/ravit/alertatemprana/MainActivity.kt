@@ -8,7 +8,6 @@
     import androidx.activity.ComponentActivity
     import androidx.activity.compose.setContent
     import androidx.activity.result.contract.ActivityResultContracts
-    import androidx.activity.viewModels
     import androidx.compose.foundation.layout.fillMaxSize
     import androidx.compose.material3.MaterialTheme
     import androidx.compose.material3.Surface
@@ -16,6 +15,7 @@
     import androidx.compose.runtime.collectAsState
     import androidx.compose.ui.Modifier
     import androidx.core.content.ContextCompat
+    import androidx.lifecycle.ViewModel
     import androidx.lifecycle.ViewModelProvider
     import androidx.lifecycle.viewmodel.compose.viewModel
     import androidx.navigation.compose.NavHost
@@ -31,7 +31,6 @@
 
     class MainActivity : ComponentActivity(), HomeViewModel.LocationPermissionRequester {
         private lateinit var homeViewModel: HomeViewModel
-//        private lateinit var chatViewModel: ChatViewModel
 
         private val locationPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
@@ -47,7 +46,6 @@
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
-//            chatViewModel = ViewModelProvider(this)[ChatViewModel::class.java]
             homeViewModel.locationPermissionRequester = this
 
             setContent {
@@ -59,20 +57,13 @@
                             launch {
                                 homeViewModel.navigationEvent.collect { event ->
                                     if (event is NavigationEvent.NavigateToChat) {
+                                        val roomId = homeViewModel.room_id.value
+                                        val chatViewModel = ViewModelProvider(this@MainActivity, ChatViewModelFactory(roomId))[ChatViewModel::class.java]
                                         navController.navigate("chatView")
                                     }
                                 }
                             }
                         }
-
-//                        launch {
-//                            chatViewModel.navigationEvent.collect { event ->
-//                                if (event is NavigationEvent.GOBackToStop) {
-//                                    navController.popBackStack()
-//                                    homeViewModel.stopLocationUpdates()
-//                                }
-//                            }
-//                        }
                     }
 
                     Surface(
@@ -82,8 +73,8 @@
                         NavHost(navController = navController, startDestination = "homeView") {
                             composable("homeView") { HomeView(viewModel = homeViewModel) }
                             composable("chatView") {
-                                val chatViewModel: ChatViewModel = viewModel()
-                                chatViewModel.room_id = homeViewModel.room_id.value
+                                val room_id = homeViewModel.room_id.value
+                                val chatViewModel = viewModel<ChatViewModel>(factory = ChatViewModelFactory(room_id))
                                 val navigationEventState = chatViewModel.navigationEvent.collectAsState(initial = null)
                                 LaunchedEffect(navigationEventState.value) {
                                     val event = navigationEventState.value
@@ -113,5 +104,13 @@
 
         override fun showLocationDisabledMessage() {
             Toast.makeText(this, "Necesitas activar la ubicación desde ajustes", Toast.LENGTH_LONG).show()
+        }
+    }
+    class ChatViewModelFactory(private val room_id: Int) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
+                return ChatViewModel(room_id) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }

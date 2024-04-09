@@ -1,8 +1,8 @@
 package com.ravit.alertatemprana.ui.model
 
 data class MessageModel (
-    val id: Int,
-    val room_id: Int,
-    val user_id: Int,
-    val body: String
+    val id: Int? = null,
+    val room_id: Int? = null,
+    val user_id: Int? = null,
+    val body: String? = null
 )

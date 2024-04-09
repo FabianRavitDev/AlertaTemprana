@@ -44,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ravit.alertatemprana.R
-import com.ravit.alertatemprana.ui.model.SenderType
 import com.ravit.alertatemprana.ui.theme.GrayPrimary
 import com.ravit.alertatemprana.ui.theme.GreenPrimary
 import com.ravit.alertatemprana.ui.theme.RedPrimary
@@ -56,7 +55,6 @@ fun ChatView(viewModel: ChatViewModel) {
     val textState by viewModel.textState.collectAsState()
     val messages by viewModel.messages.collectAsState()
     val showDialog = remember { mutableStateOf(false) }
-    viewModel.fetchMessage()
     val MonserratFontFamily = FontFamily(
         Font(R.font.montserrat, FontWeight.Normal),
         Font(R.font.montserrat_bold, FontWeight.Bold),
@@ -176,29 +174,31 @@ fun ChatView(viewModel: ChatViewModel) {
                             .fillMaxWidth()
                             .padding(8.dp)
                             .then(
-                                if (message.sender == SenderType.SEND) {
+                                if (message.user_id == viewModel.userID) {
                                     Modifier.padding(start = 64.dp)
                                 } else {
                                     Modifier.padding(end = 64.dp)
                                 }
                             ),
-                        contentAlignment = if (message.sender == SenderType.SEND) Alignment.CenterEnd else Alignment.CenterStart
+                        contentAlignment = if (message.user_id == viewModel.userID) Alignment.CenterEnd else Alignment.CenterStart
                     ) {
-                        Text(
-                            text = message.message,
-                            color = Color.Black, //  Color.White
-                            style = androidx.compose.ui.text.TextStyle(
-                                fontWeight = FontWeight.SemiBold,
-                                fontFamily = MonserratFontFamily,
-                                fontSize = 16.sp,
-                            ),
-                            modifier = Modifier
-                                .background(
-                                    color = if (message.sender == SenderType.SEND) GreenPrimary.copy(alpha = 0.25f) else Color.LightGray.copy(alpha = 0.25f), // Color.White
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .padding(8.dp)
-                        )
+                        message.body?.let {
+                            Text(
+                                text = it,
+                                color = Color.Black, //  Color.White
+                                style = androidx.compose.ui.text.TextStyle(
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontFamily = MonserratFontFamily,
+                                    fontSize = 16.sp,
+                                ),
+                                modifier = Modifier
+                                    .background(
+                                        color = if (message.user_id == viewModel.userID) GreenPrimary.copy(alpha = 0.25f) else Color.LightGray.copy(alpha = 0.25f), // Color.White
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                                    .padding(8.dp)
+                            )
+                        }
                     }
                 }
             }
