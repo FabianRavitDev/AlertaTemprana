@@ -11,9 +11,11 @@ import android.location.LocationManager
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ravit.alertatemprana.network.NetworkManager
+import com.ravit.alertatemprana.network.WebSocket.WebSocketManager
 import com.ravit.alertatemprana.ui.model.LocationModel
 import com.ravit.alertatemprana.ui.model.PositionModel
 import com.ravit.alertatemprana.ui.navigation.NavigationEvent
@@ -54,7 +56,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private var locationTimer: Timer? = null
 
-
     fun toggleDialog(show: Boolean) {
         _showDialog.value = show
     }
@@ -81,12 +82,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun login() {
         _isLoading.value = true
-        NetworkManager.loginLocation(onSuccess = {
+        NetworkManager.loginLocation(
+            onSuccess = {
             if (_isLoading.value) {
                 sendFirstAlert()
                 _isLoading.value = false
             }
-        }, onFailure = { error ->
+        },
+            onFailure = { error ->
             _error.value = true
             _isLoading.value = false
             Log.d("NetworkManager", "Error login: ${error}")
@@ -95,24 +98,46 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun sendFirstAlert() {
+        val permissionCheck = ContextCompat.checkSelfPermission(
+            getApplication(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            _isLoading.value = false
+            _error.value = true
+            _messageError.value = "Se requieren permisos de ubicación para enviar la alerta."
+            return
+        }
+
         _isLoading.value = true
-        val data = LocationModel(description = "Send location", severity = "Media", status = "activa")
+        val data = LocationModel(description = "Alerta generada", severity = "Media", status = "activa")
         NetworkManager.sendAlert(data,
             onSuccess = { locationModel ->
-                _room_id.value = locationModel.room_id!! // TO DO
-                Log.e("NetworkManager", "first alert: ${_room_id.value}")
+                _room_id.value = locationModel.room_id!!
+                startLocationUpdates()
                 goToChat()
+                Log.e("NetworkManager", "first alert: ${_room_id.value}")
             },
             onFailure = { error ->
+                _isLoading.value = false
                 _error.value = true
                 _messageError.value = error.toString()
                 Log.e("NetworkManager", "Error al enviar first alerta: $error")
-                // Lógica adicional para manejar el error
             })
     }
 
-    @SuppressLint("MissingPermission")
     fun startLocationUpdates() {
+        val permissionCheck = ContextCompat.checkSelfPermission(
+            getApplication(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            locationPermissionRequester?.requestLocationPermissions()
+            return
+        }
+
         _isLoading.value = true
         if (isLocationPermissionGranted()) {
             locationListener = LocationListener { location ->
@@ -173,9 +198,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun goToChat() {
+        _isLoading.value = false
         viewModelScope.launch {
             _navigationEvent.emit(NavigationEvent.NavigateToChat)
         }
-        startLocationUpdates()
     }
 }

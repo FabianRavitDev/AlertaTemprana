@@ -99,8 +99,8 @@ fun HomeView(viewModel: HomeViewModel) {
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.login()
                         viewModel.toggleDialog(false)
+                        viewModel.login()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = YellowPrimary,
@@ -203,7 +203,8 @@ fun HomeView(viewModel: HomeViewModel) {
                         viewModel.toggleDialog(true)
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = YellowPrimary)
+                    colors = ButtonDefaults.buttonColors(containerColor = YellowPrimary),
+                    enabled = !isLoading
                 ) {
                     Text(text = "Enviar Alerta",
                         style = androidx.compose.ui.text.TextStyle(

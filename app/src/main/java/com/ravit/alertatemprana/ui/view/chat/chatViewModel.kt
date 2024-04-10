@@ -13,6 +13,7 @@ import com.ravit.alertatemprana.network.WebSocket.WebSocketManager
 import com.ravit.alertatemprana.ui.model.MessageModel
 import com.ravit.alertatemprana.ui.model.Singleton.UserManager
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -28,6 +29,9 @@ class ChatViewModel(val room_id: Int) : ViewModel() {
 
     private val _error = MutableStateFlow("")
     val error: StateFlow<String> = _error.asStateFlow()
+
+    private val _backEvent = MutableSharedFlow<Unit>()
+    val backEvent: SharedFlow<Unit> = _backEvent
 
     val userID = UserManager.getId()
 

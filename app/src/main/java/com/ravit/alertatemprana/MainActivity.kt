@@ -42,6 +42,9 @@
             }
         }
 
+        @SuppressLint("MissingSuperCall")
+        override fun onBackPressed() { }
+
         @SuppressLint("StateFlowValueCalledInComposition")
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
