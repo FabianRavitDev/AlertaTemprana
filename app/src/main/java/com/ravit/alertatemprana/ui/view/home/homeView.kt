@@ -6,7 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -148,7 +150,8 @@ fun HomeView(viewModel: HomeViewModel) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(2f),
+//                    .background(Color.Gray)
+                ,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -163,10 +166,11 @@ fun HomeView(viewModel: HomeViewModel) {
                     )
                 )
             }
-            Column(
+            Column( // Image
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(1f)
+                    .weight(1f)
+//                    .background(Color.Blue)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logovertical),
@@ -177,11 +181,11 @@ fun HomeView(viewModel: HomeViewModel) {
                     contentScale = ContentScale.Fit
                 )
             }
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(2f),
+//                    .background(Color.Red)
+                ,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -215,13 +219,7 @@ fun HomeView(viewModel: HomeViewModel) {
                         )
                     )
                 }
-            }
-            Column (modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ){
+
                 Text(
                     text = "Versión Beta 1.0",
                     style = androidx.compose.ui.text.TextStyle(

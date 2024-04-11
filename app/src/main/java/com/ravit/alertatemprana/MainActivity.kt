@@ -2,6 +2,7 @@
 
     import android.Manifest
     import android.annotation.SuppressLint
+    import android.content.pm.ActivityInfo
     import android.content.pm.PackageManager
     import android.os.Bundle
     import android.widget.Toast
@@ -48,6 +49,7 @@
             super.onCreate(savedInstanceState)
             homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
             homeViewModel.locationPermissionRequester = this
+            this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
             setContent {
                 AlertaTempranaTheme {
