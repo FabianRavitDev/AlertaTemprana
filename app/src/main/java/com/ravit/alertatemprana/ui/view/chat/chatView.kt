@@ -121,12 +121,12 @@ fun ChatView(viewModel: ChatViewModel) {
                         Row (modifier = Modifier.padding(vertical = 10.dp)) {
                             Text(
                                 text = "Alerta enviada",
-                                color = GreenPrimary,
+                                color = Color.White,
                                 style = androidx.compose.ui.text.TextStyle(
                                     fontWeight = FontWeight.SemiBold,
                                     fontFamily = MonserratFontFamily,
                                     fontSize = 18.sp,
-                                    color = GreenPrimary
+                                    color = Color.White
                                 )
                             )
                         }
@@ -136,24 +136,24 @@ fun ChatView(viewModel: ChatViewModel) {
                             onClick = { showDialog.value = true },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Transparent,
-                                contentColor = RedPrimary
+                                contentColor = YellowPrimary
                             )
                         ) {
                             Text(
                                 text = "Detener Alerta",
-                                color = RedPrimary,
+                                color = YellowPrimary,
                                 style = androidx.compose.ui.text.TextStyle(
                                     fontWeight = FontWeight.SemiBold,
                                     fontFamily = MonserratFontFamily,
                                     fontSize = 14.sp,
-                                    color = RedPrimary
+                                    color = YellowPrimary
                                 )
                             )
                         }
                     }
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
-                containerColor = YellowPrimary.copy(alpha = 0.5f)
+                containerColor = GreenPrimary
                 )
             )
         },

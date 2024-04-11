@@ -98,18 +98,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun sendFirstAlert() {
-        val permissionCheck = ContextCompat.checkSelfPermission(
-            getApplication(),
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
-
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            _isLoading.value = false
-            _error.value = true
-            _messageError.value = "Se requieren permisos de ubicación para enviar la alerta."
-            return
-        }
-
         _isLoading.value = true
         val data = LocationModel(description = "Alerta generada", severity = "Media", status = "activa")
         NetworkManager.sendAlert(data,
