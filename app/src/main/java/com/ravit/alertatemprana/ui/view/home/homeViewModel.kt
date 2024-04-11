@@ -134,7 +134,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         )
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            locationPermissionRequester?.requestLocationPermissions()
+            _isLoading.value = false
+            _error.value = true
+            _messageError.value = "Se requieren permisos de ubicación para enviar la alerta."
             return
         }
 

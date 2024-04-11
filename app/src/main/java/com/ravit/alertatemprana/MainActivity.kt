@@ -35,9 +35,7 @@
         private val locationPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
-            if (isGranted) {
-                homeViewModel.startLocationUpdates()
-            } else {
+            if (!isGranted) {
                 showLocationDisabledMessage()
             }
         }
