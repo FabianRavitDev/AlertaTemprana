@@ -93,7 +93,6 @@ object WebSocketManager {
                             user_id = userId,
                             body = body
                         )
-                        Log.d("NetworkManager", "Received unknown message: $actualJson")
                         if (UserManager.getId() != userId) {
                             viewModel.handleWebSocketMessage(messageModel)
                         }

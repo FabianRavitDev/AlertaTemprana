@@ -1,5 +1,6 @@
 package com.ravit.alertatemprana.ui.view.chat
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,16 +42,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ravit.alertatemprana.R
+import com.ravit.alertatemprana.ui.model.String.Messages
 import com.ravit.alertatemprana.ui.theme.GrayPrimary
 import com.ravit.alertatemprana.ui.theme.GreenPrimary
 import com.ravit.alertatemprana.ui.theme.RedPrimary
 import com.ravit.alertatemprana.ui.theme.YellowPrimary
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatView(viewModel: ChatViewModel) {
     val textState by viewModel.textState.collectAsState()
     val messages by viewModel.messages.collectAsState()
+    val error by viewModel.isStopLocation.collectAsState()
     val showDialog = remember { mutableStateOf(false) }
     val MonserratFontFamily = FontFamily(
         Font(R.font.montserrat, FontWeight.Normal),
@@ -62,13 +66,13 @@ fun ChatView(viewModel: ChatViewModel) {
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text(text = "Alerta", style = androidx.compose.ui.text.TextStyle(
+            title = { Text(text = Messages.TITLE_ALERT, style = androidx.compose.ui.text.TextStyle(
                 fontWeight = FontWeight.Bold,
                 fontFamily = MonserratFontFamily,
                 fontSize = 24.sp,
                 color = GreenPrimary
             )) },
-            text = { Text(text = "¿Deseas finalizar la alerta?",
+            text = { Text(text = Messages.MENSAJE_END_ALERT,
                 style = androidx.compose.ui.text.TextStyle(
                     fontWeight = FontWeight.SemiBold,
                     fontFamily = MonserratFontFamily,
@@ -104,6 +108,43 @@ fun ChatView(viewModel: ChatViewModel) {
                         fontFamily = MonserratFontFamily,
                         fontSize = 14.sp,
                         color = Color.White
+                    ))
+                }
+            }
+        )
+    }
+
+    if (error) {
+        AlertDialog(
+            onDismissRequest = { viewModel.goBack() },
+            title = { Text(text = Messages.TITLE_ALERT,
+                            style = androidx.compose.ui.text.TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = MonserratFontFamily,
+                                fontSize = 24.sp,
+                                color = GreenPrimary
+                            )
+                        )
+                    },
+            text = { Text(text = Messages.MENSAJE_STOP_ALERT,
+                style = androidx.compose.ui.text.TextStyle(
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = MonserratFontFamily,
+                    fontSize = 20.sp,
+                    color = Color.Black
+                )) },
+            confirmButton = {
+                Button(onClick = { viewModel.goBack() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = YellowPrimary,
+                        contentColor = Color.White
+                    )) {
+                    Text(text = "OK",
+                        style = androidx.compose.ui.text.TextStyle(
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = MonserratFontFamily,
+                        fontSize = 14.sp,
+                        color = GreenPrimary
                     ))
                 }
             }
@@ -191,7 +232,9 @@ fun ChatView(viewModel: ChatViewModel) {
                                 ),
                                 modifier = Modifier
                                     .background(
-                                        color = if (message.user_id == viewModel.userID) GreenPrimary.copy(alpha = 0.25f) else Color.LightGray.copy(alpha = 0.25f), // Color.White
+                                        color = if (message.user_id == viewModel.userID) GreenPrimary.copy(
+                                            alpha = 0.25f
+                                        ) else Color.LightGray.copy(alpha = 0.25f), // Color.White
                                         shape = RoundedCornerShape(12.dp)
                                     )
                                     .padding(8.dp)

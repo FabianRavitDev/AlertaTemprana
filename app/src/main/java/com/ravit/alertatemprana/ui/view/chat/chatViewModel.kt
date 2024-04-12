@@ -27,8 +27,8 @@ class ChatViewModel(val room_id: Int) : ViewModel() {
     private val _messages = MutableStateFlow<List<MessageModel>>(emptyList())
     val messages: StateFlow<List<MessageModel>> = _messages.asStateFlow()
 
-    private val _error = MutableStateFlow("")
-    val error: StateFlow<String> = _error.asStateFlow()
+    private val _isStopLocation = MutableStateFlow(false)
+    val isStopLocation = _isStopLocation.asStateFlow()
 
     private val _backEvent = MutableSharedFlow<Unit>()
     val backEvent: SharedFlow<Unit> = _backEvent
@@ -57,8 +57,8 @@ class ChatViewModel(val room_id: Int) : ViewModel() {
                 onSuccess = {
                     Log.d("NetworkManager", "send message = $it")
             },
-                onFailure = {error
-                    Log.d("NetworkManager", "Error = $error")
+                onFailure = {
+                    Log.d("NetworkManager", "Error = $it")
                 }
             )
             _textState.value = TextFieldValue("")
@@ -66,7 +66,7 @@ class ChatViewModel(val room_id: Int) : ViewModel() {
     }
     fun handleWebSocketMessage(message: MessageModel) {
         if (message.body == "Servicio detenido") {
-            goBack()
+            _isStopLocation.value = true
             return
         }
             _messages.value = _messages.value + message
