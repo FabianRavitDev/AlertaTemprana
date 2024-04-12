@@ -50,7 +50,7 @@ fun HomeView(viewModel: HomeViewModel) {
         Font(R.font.montserrat_italic, FontWeight.Normal)
     )
 
-    if (error) {
+    if (error && viewModel.messageError != null) {
             AlertDialog(
                 onDismissRequest = { viewModel.toggleError(false) },
                 title = { Text(text = "Error",

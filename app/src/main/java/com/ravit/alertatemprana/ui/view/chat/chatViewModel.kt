@@ -65,6 +65,10 @@ class ChatViewModel(val room_id: Int) : ViewModel() {
         }
     }
     fun handleWebSocketMessage(message: MessageModel) {
+        if (message.body == "Servicio detenido") {
+            goBack()
+            return
+        }
             _messages.value = _messages.value + message
     }
 

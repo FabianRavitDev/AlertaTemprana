@@ -31,6 +31,10 @@ object WebSocketManager {
                         "identifier",
                         "{\"channel\":\"RoomChannel\",\"room_id\":\"$roomId\"}"
                     )
+                    subscribeMessage.put(
+                        "identifier",
+                        "{\"channel\":\"ServicesChannel\",\"room_id\":\"$roomId\"}"
+                    )
                     webSocket.send(subscribeMessage.toString())
                 } catch (e: JSONException) {
                     e.printStackTrace()
@@ -59,12 +63,25 @@ object WebSocketManager {
                 try {
                     val json = JSONObject(text)
                     if (json.has("type") && json.getString("type") == "ping") {
-                        Log.d("NetworkManager", "Received ping message: $text")
-                    } else if (json.has("identifier") && json.has("message")) {
+//                        Log.d("NetworkManager", "Received ping message: $text")
+                    }
+                    else if (json.has("identifier") && json.has("message"))
+                    {
                         val messageJson = json.getJSONObject("message")
                         val actualMessage = messageJson.getString("message")
-                        val actualJson = JSONObject(actualMessage)
 
+                        if (actualMessage == "Servicio detenido") {
+                            val servicioStop = messageJson.getInt("stopedServiceId")
+                            val messageModel = MessageModel(
+                                id = 0,
+                                room_id = servicioStop,
+                                user_id = 0,
+                                body = actualMessage
+                            )
+                            viewModel.handleWebSocketMessage(messageModel)
+                        }
+
+                        val actualJson = JSONObject(actualMessage)
                         val userId = actualJson.getInt("user_id")
                         val body = actualJson.getString("body")
                         val messageId = actualJson.getInt("id")
@@ -76,12 +93,13 @@ object WebSocketManager {
                             user_id = userId,
                             body = body
                         )
-//                        Log.d("NetworkManager", "Received unknown message: $actualJson")
+                        Log.d("NetworkManager", "Received unknown message: $actualJson")
                         if (UserManager.getId() != userId) {
                             viewModel.handleWebSocketMessage(messageModel)
                         }
-                    } else {
-//                        Log.d("NetworkManager", "Received unknown message: $text")
+                    }
+                    else {
+                        Log.d("NetworkManager", "Received unknown message: $text")
                     }
                 } catch (e: JSONException) {
                     Log.e("NetworkManager", "Error parsing message: $text")
