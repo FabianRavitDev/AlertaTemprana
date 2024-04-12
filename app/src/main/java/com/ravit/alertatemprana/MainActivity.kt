@@ -83,7 +83,12 @@
                                     val event = navigationEventState.value
                                     if (event is NavigationEvent.GOBackToStop) {
                                         navController.popBackStack()
-                                        homeViewModel.stopLocationUpdates()
+                                        homeViewModel.setMensageError("")
+                                        if (!chatViewModel.isStopLocation.value) {
+                                            homeViewModel.stopLocationUpdates()
+                                        }else {
+                                            homeViewModel.stopLoading()
+                                        }
                                     }
                                 }
                                 ChatView(viewModel = chatViewModel)

@@ -50,7 +50,7 @@ fun HomeView(viewModel: HomeViewModel) {
         Font(R.font.montserrat_italic, FontWeight.Normal)
     )
 
-    if (error && viewModel.messageError != null) {
+    if (error && !viewModel.messageError.value.isEmpty()) {
             AlertDialog(
                 onDismissRequest = { viewModel.toggleError(false) },
                 title = { Text(text = "Error",
@@ -150,7 +150,6 @@ fun HomeView(viewModel: HomeViewModel) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-//                    .background(Color.Gray)
                 ,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -170,7 +169,6 @@ fun HomeView(viewModel: HomeViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-//                    .background(Color.Blue)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logovertical),
@@ -184,7 +182,6 @@ fun HomeView(viewModel: HomeViewModel) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-//                    .background(Color.Red)
                 ,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center

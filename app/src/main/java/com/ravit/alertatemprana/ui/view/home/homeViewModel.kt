@@ -15,7 +15,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ravit.alertatemprana.network.NetworkManager
-import com.ravit.alertatemprana.network.WebSocket.WebSocketManager
 import com.ravit.alertatemprana.ui.model.LocationModel
 import com.ravit.alertatemprana.ui.model.PositionModel
 import com.ravit.alertatemprana.ui.navigation.NavigationEvent
@@ -69,6 +68,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _room_id = MutableStateFlow(0)
     val room_id = _room_id.asStateFlow()
 
+    fun stopLoading() {
+        _isLoading.value = false
+    }
+
+    fun setMensageError(error: String){
+        _messageError.value = error
+    }
+
     private fun isLocationPermissionGranted(): Boolean {
         return ActivityCompat.checkSelfPermission(
             getApplication(),
@@ -86,14 +93,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             onSuccess = {
             if (_isLoading.value) {
                 sendFirstAlert()
-                _isLoading.value = false
             }
         },
             onFailure = { error ->
             _error.value = true
-            _isLoading.value = false
             Log.d("NetworkManager", "Error login: ${error}")
             _messageError.value = error.toString()
+            _isLoading.value = false
         })
     }
 
@@ -108,14 +114,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 Log.e("NetworkManager", "first alert: ${_room_id.value}")
             },
             onFailure = { error ->
-                _isLoading.value = false
                 _error.value = true
                 _messageError.value = error.toString()
+                _isLoading.value = false
                 Log.e("NetworkManager", "Error al enviar first alerta: $error")
             })
     }
 
     fun startLocationUpdates() {
+        _isLoading.value = true
+
         val permissionCheck = ContextCompat.checkSelfPermission(
             getApplication(),
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -128,7 +136,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        _isLoading.value = true
         if (isLocationPermissionGranted()) {
             locationListener = LocationListener { location ->
                 _location.value = location
@@ -144,16 +151,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                         override fun run() {
                             NetworkManager.sendLocation(locat,
                                 onSuccess = {
-                                    _isLoading.value = false
                                 },
                                 onFailure = { error ->
-                                    _isLoading.value = false
                                     _error.value = true
                                     _messageError.value = error.toString()
+                                    _isLoading.value = false
                                     Log.e("NetworkManager", "Error en start location: $error")
                                 })
                         }
-                    }, 0, 10 * 1000)
+                    }, 0, 60 * 1000)
                 }
             }
             locationManager.requestLocationUpdates(
@@ -188,7 +194,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun goToChat() {
-        _isLoading.value = false
         viewModelScope.launch {
             _navigationEvent.emit(NavigationEvent.NavigateToChat)
         }
