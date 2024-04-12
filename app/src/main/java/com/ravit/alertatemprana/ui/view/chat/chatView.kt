@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ravit.alertatemprana.R
+import com.ravit.alertatemprana.network.WebSocket.WebSocketRoomChannel
 import com.ravit.alertatemprana.ui.model.String.Messages
 import com.ravit.alertatemprana.ui.theme.GrayPrimary
 import com.ravit.alertatemprana.ui.theme.GreenPrimary
@@ -84,6 +85,7 @@ fun ChatView(viewModel: ChatViewModel) {
                     onClick = {
                         viewModel.goBack()
                         showDialog.value = false
+                        WebSocketRoomChannel.disconnect()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = YellowPrimary,

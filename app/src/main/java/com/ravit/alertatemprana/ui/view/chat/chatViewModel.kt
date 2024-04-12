@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewModelScope
 import com.ravit.alertatemprana.network.NetworkManager
-import com.ravit.alertatemprana.network.WebSocket.WebSocketManager
+import com.ravit.alertatemprana.network.WebSocket.WebSocketRoomChannel
 import com.ravit.alertatemprana.ui.model.MessageModel
 import com.ravit.alertatemprana.ui.model.Singleton.UserManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,20 +30,17 @@ class ChatViewModel(val room_id: Int) : ViewModel() {
     private val _isStopLocation = MutableStateFlow(false)
     val isStopLocation = _isStopLocation.asStateFlow()
 
-    private val _backEvent = MutableSharedFlow<Unit>()
-    val backEvent: SharedFlow<Unit> = _backEvent
-
     val userID = UserManager.getId()
 
     init {
-        if (room_id != 0) {
-            WebSocketManager.connectToChatChannel(this, room_id)
+        if (room_id != null) {
+            WebSocketRoomChannel.connectToChatChannel(this, room_id)
+            _isStopLocation.value = false
         }
     }
 
     fun goBack() {
         viewModelScope.launch {
-            WebSocketManager.disconnect()
             _navigationEvent.emit(NavigationEvent.GOBackToStop)
         }
     }
@@ -69,7 +66,7 @@ class ChatViewModel(val room_id: Int) : ViewModel() {
             _isStopLocation.value = true
             return
         }
-            _messages.value = _messages.value + message
+        _messages.value = _messages.value + message
     }
 
     fun updateTextState(newText: String) {
@@ -78,6 +75,5 @@ class ChatViewModel(val room_id: Int) : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        WebSocketManager.disconnect()
     }
 }

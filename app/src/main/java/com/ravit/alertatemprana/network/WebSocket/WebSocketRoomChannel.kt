@@ -1,7 +1,5 @@
 package com.ravit.alertatemprana.network.WebSocket
 
-// En el archivo WebSocketManager.kt dentro del directorio network
-
 import android.util.Log
 import com.ravit.alertatemprana.ui.model.MessageModel
 import com.ravit.alertatemprana.ui.model.Singleton.UserManager
@@ -12,10 +10,9 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import org.json.JSONException
-
 import org.json.JSONObject
 
-object WebSocketManager {
+object WebSocketRoomChannel {
     private var webSocket: WebSocket? = null
     fun connectToChatChannel(viewModel: ChatViewModel, roomId: Int) {
         val token = UserManager.getToken()
@@ -29,9 +26,10 @@ object WebSocketManager {
                     subscribeMessage.put("command", "subscribe")
                     subscribeMessage.put(
                         "identifier",
-                        "{\"channel\":\"RoomChannel\",\"room_id\":\"$roomId\"}"
+                        "{\"channel\":\"ServicesChannel\",\"room_id\":\"$roomId\"}"
                     )
                     webSocket.send(subscribeMessage.toString())
+                    WebSocketManager.connectToChatChannel(viewModel,roomId)
                 } catch (e: JSONException) {
                     e.printStackTrace()
                 }
@@ -66,20 +64,14 @@ object WebSocketManager {
                         val messageJson = json.getJSONObject("message")
                         val actualMessage = messageJson.getString("message")
 
-                        val actualJson = JSONObject(actualMessage)
-                        val userId = actualJson.getInt("user_id")
-                        val body = actualJson.getString("body")
-                        val messageId = actualJson.getInt("id")
-                        val roomId = actualJson.getInt("room_id")
-
-                        val messageModel = MessageModel(
-                            id = messageId,
-                            room_id = roomId,
-                            user_id = userId,
-                            body = body
-                        )
-                        Log.d("NetworkManager", "Received unknown message: $actualJson")
-                        if (UserManager.getId() != userId) {
+                        if (actualMessage == "Servicio detenido") {
+                            val servicioStop = messageJson.getInt("stopedServiceId")
+                            val messageModel = MessageModel(
+                                id = 0,
+                                room_id = servicioStop,
+                                user_id = 0,
+                                body = actualMessage
+                            )
                             viewModel.handleWebSocketMessage(messageModel)
                         }
                     }
@@ -95,9 +87,9 @@ object WebSocketManager {
     }
 
     fun disconnect() {
+        WebSocketManager.disconnect()
         webSocket?.cancel()
         webSocket?.close(1000, "Socket closed by client")
         webSocket = null
-
     }
 }
