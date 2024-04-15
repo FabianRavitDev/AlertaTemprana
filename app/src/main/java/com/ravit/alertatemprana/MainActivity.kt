@@ -22,6 +22,7 @@
     import androidx.navigation.compose.NavHost
     import androidx.navigation.compose.composable
     import androidx.navigation.compose.rememberNavController
+    import com.ravit.alertatemprana.ui.model.String.Messages
     import com.ravit.alertatemprana.ui.navigation.NavigationEvent
     import com.ravit.alertatemprana.ui.theme.AlertaTempranaTheme
     import com.ravit.alertatemprana.ui.view.chat.ChatView
@@ -61,7 +62,11 @@
                                 homeViewModel.navigationEvent.collect { event ->
                                     if (event is NavigationEvent.NavigateToChat) {
                                         val roomId = homeViewModel.room_id.value
-                                        val chatViewModel = ViewModelProvider(this@MainActivity, ChatViewModelFactory(roomId))[ChatViewModel::class.java]
+                                        var noLocation = false
+                                        if (homeViewModel.messageError.value == Messages.NO_LOCATION_MESSAGE_ERROR ){
+                                            noLocation = true
+                                        }
+                                        val chatViewModel = ViewModelProvider(this@MainActivity, ChatViewModelFactory(roomId, noLocation))[ChatViewModel::class.java]
                                         navController.navigate("chatView")
                                     }
                                 }
@@ -77,7 +82,11 @@
                             composable("homeView") { HomeView(viewModel = homeViewModel) }
                             composable("chatView") {
                                 val room_id = homeViewModel.room_id.value
-                                val chatViewModel = viewModel<ChatViewModel>(factory = ChatViewModelFactory(room_id))
+                                var noLocation = false
+                                if (homeViewModel.messageError.value == Messages.NO_LOCATION_MESSAGE_ERROR ){
+                                    noLocation = true
+                                }
+                                val chatViewModel = viewModel<ChatViewModel>(factory = ChatViewModelFactory(room_id, noLocation))
                                 val navigationEventState = chatViewModel.navigationEvent.collectAsState(initial = null)
                                 LaunchedEffect(navigationEventState.value) {
                                     val event = navigationEventState.value
@@ -111,13 +120,13 @@
         }
 
         override fun showLocationDisabledMessage() {
-            Toast.makeText(this, "Necesitas activar la ubicación desde ajustes", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, Messages.REQUEST_LOCATION_PERMISIONS, Toast.LENGTH_LONG).show()
         }
     }
-    class ChatViewModelFactory(private val room_id: Int) : ViewModelProvider.Factory {
+    class ChatViewModelFactory(private val room_id: Int, private val noLocation: Boolean) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
-                return ChatViewModel(room_id) as T
+                return ChatViewModel(room_id, noLocation ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

@@ -17,6 +17,7 @@ import androidx.lifecycle.viewModelScope
 import com.ravit.alertatemprana.network.NetworkManager
 import com.ravit.alertatemprana.ui.model.LocationModel
 import com.ravit.alertatemprana.ui.model.PositionModel
+import com.ravit.alertatemprana.ui.model.String.Messages
 import com.ravit.alertatemprana.ui.navigation.NavigationEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -132,7 +133,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             _isLoading.value = false
             _error.value = true
-            _messageError.value = "Se requieren permisos de ubicación para enviar la alerta."
+            _messageError.value = Messages.NO_LOCATION_MESSAGE_ERROR
             return
         }
 

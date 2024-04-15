@@ -9,12 +9,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -35,7 +36,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -46,7 +49,6 @@ import com.ravit.alertatemprana.network.WebSocket.WebSocketRoomChannel
 import com.ravit.alertatemprana.ui.model.String.Messages
 import com.ravit.alertatemprana.ui.theme.GrayPrimary
 import com.ravit.alertatemprana.ui.theme.GreenPrimary
-import com.ravit.alertatemprana.ui.theme.RedPrimary
 import com.ravit.alertatemprana.ui.theme.YellowPrimary
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -56,6 +58,7 @@ fun ChatView(viewModel: ChatViewModel) {
     val textState by viewModel.textState.collectAsState()
     val messages by viewModel.messages.collectAsState()
     val error by viewModel.isStopLocation.collectAsState()
+    val nolocation by viewModel.noLocation.collectAsState()
     val showDialog = remember { mutableStateOf(false) }
     val MonserratFontFamily = FontFamily(
         Font(R.font.montserrat, FontWeight.Normal),
@@ -163,7 +166,7 @@ fun ChatView(viewModel: ChatViewModel) {
                     ) {
                         Row (modifier = Modifier.padding(vertical = 10.dp)) {
                             Text(
-                                text = "Alerta enviada",
+                                text = Messages.SENT_ALERT,
                                 color = Color.White,
                                 style = androidx.compose.ui.text.TextStyle(
                                     fontWeight = FontWeight.SemiBold,
@@ -183,7 +186,7 @@ fun ChatView(viewModel: ChatViewModel) {
                             )
                         ) {
                             Text(
-                                text = "Detener Alerta",
+                                text = Messages.STOP_ALERT,
                                 color = YellowPrimary,
                                 style = androidx.compose.ui.text.TextStyle(
                                     fontWeight = FontWeight.SemiBold,
@@ -205,6 +208,28 @@ fun ChatView(viewModel: ChatViewModel) {
             .fillMaxSize()
             .padding(it)
         ) {
+            if (nolocation) {
+                Snackbar(
+                    modifier = Modifier.padding(8.dp).alpha(0.5f),
+                    containerColor = YellowPrimary,
+                    action = {
+                        IconButton(onClick = { viewModel.closeNoLocation() }) {
+                            Icon(Icons.Default.Close, contentDescription = "Cerrar",
+                                tint = Color.Black )
+                        }
+                    }
+                ) {
+                    Text(
+                        text = Messages.NO_SHARED_LOCATION,
+                        style = TextStyle(
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = MonserratFontFamily,
+                            fontSize = 14.sp,
+                            color = Color.Black
+                        )
+                    )
+                }
+            }
             LazyColumn(modifier = Modifier
                 .weight(1f),
                 reverseLayout = true
@@ -226,8 +251,8 @@ fun ChatView(viewModel: ChatViewModel) {
                         message.body?.let {
                             Text(
                                 text = it,
-                                color = Color.Black, //  Color.White
-                                style = androidx.compose.ui.text.TextStyle(
+                                color = Color.Black,
+                                style = TextStyle(
                                     fontWeight = FontWeight.SemiBold,
                                     fontFamily = MonserratFontFamily,
                                     fontSize = 16.sp,
@@ -236,7 +261,7 @@ fun ChatView(viewModel: ChatViewModel) {
                                     .background(
                                         color = if (message.user_id == viewModel.userID) GreenPrimary.copy(
                                             alpha = 0.25f
-                                        ) else Color.LightGray.copy(alpha = 0.25f), // Color.White
+                                        ) else Color.LightGray.copy(alpha = 0.25f),
                                         shape = RoundedCornerShape(12.dp)
                                     )
                                     .padding(8.dp)

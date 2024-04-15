@@ -12,12 +12,12 @@ import com.ravit.alertatemprana.network.NetworkManager
 import com.ravit.alertatemprana.network.WebSocket.WebSocketRoomChannel
 import com.ravit.alertatemprana.ui.model.MessageModel
 import com.ravit.alertatemprana.ui.model.Singleton.UserManager
+import com.ravit.alertatemprana.ui.model.String.Messages
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class ChatViewModel(val room_id: Int) : ViewModel() {
+class ChatViewModel(val room_id: Int, noLocation: Boolean) : ViewModel() {
     private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
     val navigationEvent = _navigationEvent.asSharedFlow()
 
@@ -30,6 +30,9 @@ class ChatViewModel(val room_id: Int) : ViewModel() {
     private val _isStopLocation = MutableStateFlow(false)
     val isStopLocation = _isStopLocation.asStateFlow()
 
+    private val _noLocation = MutableStateFlow(noLocation)
+    val noLocation = _noLocation.asStateFlow()
+
     val userID = UserManager.getId()
 
     init {
@@ -37,6 +40,10 @@ class ChatViewModel(val room_id: Int) : ViewModel() {
             WebSocketRoomChannel.connectToChatChannel(this, room_id)
             _isStopLocation.value = false
         }
+    }
+
+    fun closeNoLocation() {
+        _noLocation.value = false
     }
 
     fun goBack() {
@@ -62,7 +69,7 @@ class ChatViewModel(val room_id: Int) : ViewModel() {
         }
     }
     fun handleWebSocketMessage(message: MessageModel) {
-        if (message.body == "Servicio detenido") {
+        if (message.body == Messages.STOP_SERVICES) {
             _isStopLocation.value = true
             return
         }
