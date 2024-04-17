@@ -70,14 +70,14 @@ fun ChatView(viewModel: ChatViewModel) {
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text(text = Messages.TITLE_ALERT, style = androidx.compose.ui.text.TextStyle(
+            title = { Text(text = Messages.TITLE_ALERT, style = TextStyle(
                 fontWeight = FontWeight.Bold,
                 fontFamily = MonserratFontFamily,
                 fontSize = 24.sp,
                 color = GreenPrimary
             )) },
             text = { Text(text = Messages.MENSAJE_END_ALERT,
-                style = androidx.compose.ui.text.TextStyle(
+                style = TextStyle(
                     fontWeight = FontWeight.SemiBold,
                     fontFamily = MonserratFontFamily,
                     fontSize = 20.sp,
@@ -95,7 +95,7 @@ fun ChatView(viewModel: ChatViewModel) {
                         contentColor = Color.White
                     )
                 ) {
-                    Text(text = "Si", style = androidx.compose.ui.text.TextStyle(
+                    Text(text = "Si", style = TextStyle(
                         fontWeight = FontWeight.SemiBold,
                         fontFamily = MonserratFontFamily,
                         fontSize = 14.sp,
@@ -108,7 +108,7 @@ fun ChatView(viewModel: ChatViewModel) {
                     containerColor = GrayPrimary,
                     contentColor = Color.White
                 )) {
-                    Text(text = "No", style = androidx.compose.ui.text.TextStyle(
+                    Text(text = "No", style = TextStyle(
                         fontWeight = FontWeight.SemiBold,
                         fontFamily = MonserratFontFamily,
                         fontSize = 14.sp,
@@ -123,7 +123,7 @@ fun ChatView(viewModel: ChatViewModel) {
         AlertDialog(
             onDismissRequest = { viewModel.goBack() },
             title = { Text(text = Messages.TITLE_ALERT,
-                            style = androidx.compose.ui.text.TextStyle(
+                            style = TextStyle(
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = MonserratFontFamily,
                                 fontSize = 24.sp,
@@ -132,7 +132,7 @@ fun ChatView(viewModel: ChatViewModel) {
                         )
                     },
             text = { Text(text = Messages.MENSAJE_STOP_ALERT,
-                style = androidx.compose.ui.text.TextStyle(
+                style = TextStyle(
                     fontWeight = FontWeight.SemiBold,
                     fontFamily = MonserratFontFamily,
                     fontSize = 20.sp,
@@ -168,7 +168,7 @@ fun ChatView(viewModel: ChatViewModel) {
                             Text(
                                 text = Messages.SENT_ALERT,
                                 color = Color.White,
-                                style = androidx.compose.ui.text.TextStyle(
+                                style = TextStyle(
                                     fontWeight = FontWeight.SemiBold,
                                     fontFamily = MonserratFontFamily,
                                     fontSize = 18.sp,
